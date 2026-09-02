@@ -24,7 +24,7 @@
 
     <section id="home">
         <h1>Welcome Home</h1>
-        <p>This is the main landing view.</p>
+        <p id="paragraph_s1">This is the main landing view.</p>
     </section>
 
     <section id="about" style="display:none;">
@@ -57,12 +57,14 @@
         window.addEventListener("message", (event) => {
           if (event.origin !== "https://portalcc.medismart.net") {
               console.log("Ignore messages from unknown origins. Content wont be decoded")
+              document.getElementById("paragraph_s1").textContent("Nothing to show here")
             return; // Ignore messages from unknown origins
           }
         
           const { action, data } = event.data;
           if (action === "greet") {
-            console.log("Received from parent:", data);
+              console.log("Received from parent:", data);
+              document.getElementById("paragraph_s1").textContent(data)
           }
         });
     </script>
