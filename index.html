@@ -37,6 +37,8 @@
         <div id="card-container">Click the nav link to load data via JavaScript.</div>
     </section>
 
+    <div id: "editor" contenteditable="true"></div>
+
     <script>
         function showSection(sectionId) {
             document.querySelectorAll('section').forEach(sec => sec.style.display = 'none');
@@ -54,7 +56,8 @@
                 container.innerHTML = items.map(item => `<div class="card"><h3>${item}</h3><p>Generated on ${new Date().toLocaleTimeString()}</p></div>`).join('');
             }, 500);
         }
-        window.addEventListener("message", (event) => {
+        window.addEventListener("message", function (event) {
+          console.log(event.origin)
           if (event.origin !== "https://portalcc.medismart.net") {
               console.log("Ignore messages from unknown origins. Content wont be decoded")
               document.getElementById("paragraph_s1").textContent = "Nothing to show here"
@@ -62,11 +65,12 @@
           }
         
           const { action, data } = event.data;
-          if (action === "greet") {
+          if (action === "init") {
               console.log("Received from parent:", data);
               document.getElementById("paragraph_s1").textContent = data
-          }
-        });
+              document.getElementById("editor").innerHTML = data;
+          }});
+        
     </script>
 </body>
 </html>
