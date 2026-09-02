@@ -54,6 +54,17 @@
                 container.innerHTML = items.map(item => `<div class="card"><h3>${item}</h3><p>Generated on ${new Date().toLocaleTimeString()}</p></div>`).join('');
             }, 500);
         }
+        window.addEventListener("message", (event) => {
+          if (event.origin !== "https://portalcc.medismart.net") {
+              console.log("Ignore messages from unknown origins. Content wont be decoded")
+            return; // Ignore messages from unknown origins
+          }
+        
+          const { action, data } = event.data;
+          if (action === "greet") {
+            console.log("Received from parent:", data);
+          }
+        });
     </script>
 </body>
 </html>
