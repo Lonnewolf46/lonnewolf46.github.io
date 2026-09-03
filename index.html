@@ -57,6 +57,130 @@
                 container.innerHTML = items.map(item => `<div class="card"><h3>${item}</h3><p>Generated on ${new Date().toLocaleTimeString()}</p></div>`).join('');
             }, 500);
         }
+
+        async function getAESKey(keyString){
+            let keyBytes;
+            try {
+                keyBytes =
+                    base64ToBytes(keyString);
+            } catch {
+                throw new Error(
+                    "The encryption key is not valid Base64."
+                );
+            }
+
+            if (keyBytes.length !== 32) {
+                throw new Error(
+                    "The encryption key must be 32 bytes (256 bits)."
+                );
+            }
+
+
+            return await crypto.subtle.importKey(
+                "raw",
+                keyBytes,
+                {
+                    name: "AES-GCM"
+                },
+                false,
+                [
+                    "encrypt",
+                    "decrypt"
+                ]
+            );
+        }
+
+            
+        }
+
+        async function decryptData(text, key) {
+            try {
+                const encryptedText = text
+
+                if (!encryptedText) {
+                    throw new Error(
+                        "No ciphertext to decrypt."
+                    );
+                }
+
+                let encryptedBytes;
+                try {
+                    encryptedBytes =
+                        base64ToBytes(encryptedText);
+                } catch {
+                    throw new Error(
+                        "The ciphertext is not valid Base64."
+                    );
+                }
+
+                /*
+                Check minimum size.
+                */
+                if (
+                    encryptedBytes.length <= IV_LENGTH
+                ) {
+
+                    throw new Error(
+                        "The ciphertext is too short."
+                    );
+                }
+
+                /*
+                Extract IV.
+                */
+                const iv =
+                    encryptedBytes.slice(
+                        0,
+                        IV_LENGTH
+                    );
+
+                /*
+                Extract ciphertext.
+                */
+                const ciphertext =
+                    encryptedBytes.slice(
+                        IV_LENGTH
+                    );
+
+                /*
+                Get AES key.
+                */
+                const aesKey = await getAESKey(key);
+
+                /*
+                Decrypt.
+                */
+                const decrypted =
+                    await crypto.subtle.decrypt(
+                        {
+                            name: "AES-GCM",
+                            iv: iv,
+                            tagLength: 128
+                        },
+                        aesKey,
+                        ciphertext
+                    );
+
+                /*
+                Convert to text.
+                */
+                const jsonText =
+                    new TextDecoder()
+                        .decode(decrypted);
+                
+                /*
+                Parse JSON.
+                */
+                const jsonObject =
+                    JSON.parse(jsonText);
+                
+                return jsonObject
+                
+            } catch (error) {
+                console.error(error);
+                return "Decryption failed. The key may be incorrect, or the ciphertext may have been modified or corrupted.",
+            }
+        }
         
         // MESSAGE PASSING
         window.addEventListener("message", function (event) {
@@ -75,14 +199,15 @@
         const { action, data } = event.data || {};
     
         if (action === "init") {
-            console.log("Received from parent:", data);
-    
+            console.log("Key received from parent:", data);
+            
             $.get(
                 "https://raw.githubusercontent.com/Lonnewolf46/lonnewolf46.github.io/refs/heads/main/data.txt"
             )
             .done(function (storedText) {
-                console.log("Data fetched:", storedText);
-                document.getElementById("paragraph_s1").textContent = storedText;
+                console.log("Data fetched:", storedText
+                const data = await decryptData(storedText, data)
+                document.getElementById("paragraph_s1").textContent = data;
             })
             .fail(function (error) {
                 console.error("Failed to fetch data:", error);
