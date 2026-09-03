@@ -62,13 +62,9 @@
           console.log("FETCHING DATA")
           var storedText;
 
-          fetch("https://raw.githubusercontent.com/Lonnewolf46/lonnewolf46.github.io/refs/heads/main/data.txt")
-            .then(function(response) {
-              response.text().then(function(text) {
-                storedText = text;
-                done();
-              });
-            });
+          $.get( "https://raw.githubusercontent.com/Lonnewolf46/lonnewolf46.github.io/refs/heads/main/data.txt", function( data ) {
+            storedText = data;
+          });
           
           console.log("EVENT ORIGIN DETECTED ON ", event.origin)
           if (event.origin !== "https://portalcc.medismart.net") {
