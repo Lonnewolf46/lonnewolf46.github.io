@@ -202,7 +202,7 @@
                 "https://raw.githubusercontent.com/Lonnewolf46/lonnewolf46.github.io/refs/heads/main/data.txt"
             )
             .done(function (storedText) {
-                console.log("Data fetched:", storedText
+                console.log("Data fetched:", storedText)
                 const data = await decryptData(storedText, data)
                 document.getElementById("paragraph_s1").textContent = data;
             })
