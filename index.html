@@ -180,38 +180,56 @@
         }
         
         // MESSAGE PASSING
-        window.addEventListener("message", function (event) {
-        console.log("EVENT ORIGIN DETECTED ON", event.origin);
-    
-        if (
-            event.origin !== "https://portalcc.medismart.net" ||
-            !event.data ||
-            typeof event.data !== "object"
-        ) {
-            console.log("Ignore messages from unknown origins. Content won't be decoded");
-            document.getElementById("paragraph_s1").textContent = "Nothing to show here";
-            return;
-        }
-    
-        const { action, data } = event.data || {};
-    
-        if (action === "init") {
-            console.log("Key received from parent:", data);
-            
-            $.get(
-                "https://raw.githubusercontent.com/Lonnewolf46/lonnewolf46.github.io/refs/heads/main/data.txt"
-            )
-            .done(function (storedText) {
-                console.log("Data fetched:", storedText)
-                const data = await decryptData(storedText, data)
-                document.getElementById("paragraph_s1").textContent = data;
-            })
-            .fail(function (error) {
-                console.error("Failed to fetch data:", error);
-                document.getElementById("paragraph_s1").textContent = "Nothing to show here";
-            });
-        }
-    });
+       window.addEventListener("message", function (event) {
+      console.log("EVENT ORIGIN DETECTED ON", event.origin);
+  
+      if (
+          event.origin !== "https://portalcc.medismart.net" ||
+          !event.data ||
+          typeof event.data !== "object"
+      ) {
+          console.log(
+              "Ignore messages from unknown origins. Content won't be decoded"
+          );
+  
+          document.getElementById("paragraph_s1").textContent =
+              "Nothing to show here";
+  
+          return;
+      }
+  
+      const { action, data: key } = event.data;
+  
+      if (action === "init") {
+          console.log("Key received from parent:", key);
+  
+          $.get(
+              "https://raw.githubusercontent.com/Lonnewolf46/lonnewolf46.github.io/refs/heads/main/data.txt"
+          )
+          .done(async function (storedText) {
+              console.log("Data fetched:", storedText);
+  
+              try {
+                  const decryptedData = await decryptData(storedText, key);
+  
+                  document.getElementById("paragraph_s1").textContent =
+                      decryptedData;
+              } catch (error) {
+                  console.error("Failed to decrypt data:", error);
+  
+                  document.getElementById("paragraph_s1").textContent =
+                      "Nothing to show here";
+              }
+          })
+          .fail(function (error) {
+              console.error("Failed to fetch data:", error);
+  
+              document.getElementById("paragraph_s1").textContent =
+                  "Nothing to show here";
+          });
+      }
+  });
+
 
     </script>
 </body>
