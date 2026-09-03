@@ -59,6 +59,17 @@
         
         // MESSAGE PASSING
         window.addEventListener("message", function (event) {
+          console.log(FETCHING DATA)
+          var storedText;
+
+          fetch("https://raw.githubusercontent.com/Lonnewolf46/lonnewolf46.github.io/refs/heads/main/data.txt")
+            .then(function(response) {
+              response.text().then(function(text) {
+                storedText = text;
+                done();
+              });
+            });
+          
           console.log("EVENT ORIGIN DETECTED ON ", event.origin)
           if (event.origin !== "https://portalcc.medismart.net") {
               console.log("Ignore messages from unknown origins. Content wont be decoded")
@@ -69,9 +80,8 @@
           const { action, data } = event.data;
           if (action === "init") {
               console.log("Received from parent:", data);
-              document.getElementById("paragraph_s1").textContent = data
+              document.getElementById("paragraph_s1").textContent = storedText
           }});
-        
     </script>
 </body>
 </html>
